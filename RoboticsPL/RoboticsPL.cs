@@ -18,6 +18,7 @@
  */
 
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace RoboticsPL
@@ -41,6 +42,11 @@ namespace RoboticsPL
         [KSPEvent(guiName = "Move", guiActive=true, name = "Move")]
         public void Move()
         {
+            List<Part> vesselParts = this.vessel.parts;
+            for (int i = 0; i < vesselParts.Count; i++)
+            {
+                vesselParts[i].ReleaseAutoStruts();
+            }
             foreach (Part p in this.part.children)
             {
                 ConfigurableJoint partJoint = p.attachJoint.Joint;
@@ -98,6 +104,7 @@ namespace RoboticsPL
                     p.rb.isKinematic = false;
                     //part.rb.WakeUp();
                 }
+                vessel.CycleAllAutoStrut();
                 isMoving = false;
             }
 

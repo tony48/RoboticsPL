@@ -29,6 +29,7 @@ namespace RoboticsPL
         private Quaternion targetRotation;
         private ModuleAnimateGeneric animationModule = null;
         private AttachNode moveNode = null;
+        private bool flightStateStarted = false;
 
         [KSPField(isPersistant = false)]
         public string animationName;
@@ -121,6 +122,31 @@ namespace RoboticsPL
             {
                 Events["Move"].guiActive = true;
             }
+        }
+        
+        public override void OnSave(ConfigNode node)
+        {
+            base.OnSave(node);
+            if (!HighLogic.LoadedSceneIsFlight)
+                return;
+            // Save original positions when saving the ship.
+            // Don't do it at the save occuring at initial scene start.
+            if (flightStateStarted) 
+            {
+                foreach (Part cpart in this.vessel.parts)
+                {
+                    cpart.UpdateOrgPosAndRot(cpart.localRoot);
+                }
+            }
+        }
+        
+
+
+        public override void OnStartFinished(StartState state)
+        {
+            base.OnStartFinished(state);
+
+            flightStateStarted = true;
         }
 
         public bool IsJointUnlocked()
